@@ -43,8 +43,19 @@ pipeline {
         }
         stage("run container"){
             steps{
-                sh "docker run -d -p 8081:80 --name Netflix abanobmorkos10/netflix:${IMAGE_VERSION}"
+                sh "docker run -d -p 8081:80 abanobmorkos10/netflix:${IMAGE_VERSION}"
             }
+        }
+    }
+    post {
+     always {
+        emailext attachLog: true,
+            subject: "'${currentBuild.result}'",
+            body: "Project: ${env.JOB_NAME}<br/>" +
+                  "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                  "URL: ${env.BUILD_URL}<br/>",
+            to: 'abanobmorkos13@gmail.com',                                
+            attachmentsPattern: 'trivy_scan.txt'
         }
     }
 }
