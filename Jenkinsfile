@@ -30,20 +30,20 @@ pipeline {
                 withCredentials([
                     usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'USER', passwordVariable: 'PASS')
                 ]){
-                    sh "docker build --build-arg TMDB_V3_API_KEY=${TMDB_TOKEN} -t abanobmorkos10/Netflix:${IMAGE_VERSION} ."
+                    sh "docker build --build-arg TMDB_V3_API_KEY=${TMDB_TOKEN} -t abanobmorkos10/netflix:${IMAGE_VERSION} ."
                     sh "echo ${PASS} | docker login -u ${USER} --password-stdin"
-                    sh "docker push abanobmorkos10/Netflix:${IMAGE_VERSION}"
+                    sh "docker push abanobmorkos10/netflix:${IMAGE_VERSION}"
                 }
             }
         }
         stage("trivy scan"){
             steps{
-                sh "trivy image abanobmorkos10/Netflix:${IMAGE_VERSION} > trivy_scan.txt"
+                sh "trivy image abanobmorkos10/netflix:${IMAGE_VERSION} > trivy_scan.txt"
             }
         }
         stage("run container"){
             steps{
-                sh "docker run -d -p 8081:80 --name Netflix abanobmorkos10/Netflix:${IMAGE_VERSION}"
+                sh "docker run -d -p 8081:80 --name Netflix abanobmorkos10/netflix:${IMAGE_VERSION}"
             }
         }
     }
