@@ -44,7 +44,7 @@ pipeline {
         stage("change image version in k8s") {
             steps {
                 script {
-                    sh "sed -i \"s|image:.*|image: ${NEXUS_SERVER}/boardgame:${IMAGE_TAG}|g\" k8s/deployment.yaml"
+                    sh "sed -i \"s|image:.*|image: abanobmorkos10/netflix:${IMAGE_VERSION}|g\" k8s/deployment.yaml"
                 }
             }
         }
