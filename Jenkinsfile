@@ -41,9 +41,25 @@ pipeline {
                 sh "trivy image abanobmorkos10/netflix:${IMAGE_VERSION} > trivy_scan.txt"
             }
         }
-        stage("run container"){
-            steps{
-                sh "docker run -d -p 8081:80 abanobmorkos10/netflix:${IMAGE_VERSION}"
+        stage("change image version in k8s") {
+            steps {
+                script {
+                    sh "sed -i \"s|image:.*|image: ${NEXUS_SERVER}/boardgame:${IMAGE_TAG}|g\" k8s/deployment.yaml"
+                }
+            }
+        }
+        stage('Commit back the Deployment File') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
+                        git config user.email "abanobmorkos10@gmail.com"
+                        git config user.name "abanobmorkosgad"
+                        git remote set-url origin https://${USER}:${PASS}@github.com/abanobmorkosgad/DevSecOps_Project.git
+                        git add .
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push origin HEAD:main
+                    '''
+                }
             }
         }
     }
